@@ -18,7 +18,7 @@ const EditPostForm = ({ match }) => {
 
   const [title, setTitle] = React.useState(post.title)
   const [content, setContent] = React.useState(post.content)
-  const [userId, setUserId] = React.useState('')
+  const [userId, setUserId] = React.useState(post.user)
 
   const selectUserOptions = users.map((user) => (
     <option key={user.id} value={user.id}>
@@ -68,6 +68,7 @@ const EditPostForm = ({ match }) => {
         type="button"
         onClick={() => {
           dispatch(updatePost({ id: postId, title, content, user: userId }))
+
           history.push('/')
         }}
       >

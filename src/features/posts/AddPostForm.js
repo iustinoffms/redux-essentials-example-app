@@ -32,9 +32,18 @@ const AddPostForm = () => {
   }
 
   const onSavePost = () => {
-    dispatch(addPost({ id: uuidv4(), title, content, user: userId }))
+    dispatch(
+      addPost({
+        id: uuidv4(),
+        title,
+        content,
+        user: userId,
+        date: new Date().toISOString(),
+      })
+    )
     setTitle('')
     setContent('')
+    setUserId('')
   }
   return (
     <section>
