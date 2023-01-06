@@ -1,16 +1,29 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { selectAllPosts, fetchPosts } from './postsSlice'
 import PostUser from './PostUser'
+import ReactionButtons from './ReactionButtons'
 import { TimeAgo } from './TimeAgo'
 
 export const PostsList = () => {
-  const posts = useSelector((state) => state.posts)
+  const dispatch = useDispatch()
+
+  const posts = useSelector(selectAllPosts)
+
+  console.log(posts)
+
+  const postStatus = useSelector((state) => state.posts.status)
 
   const orderedPosts = posts
     .slice()
     .sort((a, b) => b.date.localeCompare(a.date))
 
+  React.useEffect(() => {
+    if (postStatus === 'idle') {
+      dispatch(fetchPosts())
+    }
+  }, [postStatus, dispatch])
   return (
     <section className="posts-lists">
       <h2>Posts</h2>
@@ -27,6 +40,7 @@ export const PostsList = () => {
           <Link to={`editPost/${post.id}`} className="button muted-button">
             EditPost
           </Link>
+          <ReactionButtons post={post} />
         </article>
       ))}
     </section>
