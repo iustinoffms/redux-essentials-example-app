@@ -5,15 +5,20 @@ import { selectAllPosts, fetchPosts } from './postsSlice'
 import PostUser from './PostUser'
 import ReactionButtons from './ReactionButtons'
 import { TimeAgo } from './TimeAgo'
+import { Spinner } from '../../components/Spinner'
+import { useSlider } from '@mui/base'
+import { selectUsers } from '../users/usersSlice'
 
-export const PostsList = () => {
+const PostsList = () => {
   const dispatch = useDispatch()
 
   const posts = useSelector(selectAllPosts)
+  const users = useSelector(selectUsers)
 
-  console.log(posts)
+
 
   const postStatus = useSelector((state) => state.posts.status)
+  const error = useSelector((state) => state.posts.error)
 
   const orderedPosts = posts
     .slice()
@@ -24,27 +29,43 @@ export const PostsList = () => {
       dispatch(fetchPosts())
     }
   }, [postStatus, dispatch])
+
+  let content
+
+  if (postStatus === 'loading') {
+    content = <Spinner text="Loading content..." />
+  } else if (postStatus === 'success') {
+    content = orderedPosts.map((post) => (
+      <SinglePost key={post.id} post={post} />
+    ))
+  } else if (postStatus === 'error') {
+    content = <div>{error}</div>
+  }
+
   return (
     <section className="posts-lists">
       <h2>Posts</h2>
-      {orderedPosts.map((post) => (
-        <article className="post-excerpt" key={post.id}>
-          <h3>{post.title}</h3>
-          <PostUser userId={post.user} />
-          <p className="posts-content">{post.content}</p>
-          <TimeAgo timestamp={post.date} />
-          <br></br>
-          <Link to={`posts/${post.id}`} className="button muted-button">
-            View Post
-          </Link>
-          <Link to={`editPost/${post.id}`} className="button muted-button">
-            EditPost
-          </Link>
-          <ReactionButtons post={post} />
-        </article>
-      ))}
+      {content}
     </section>
   )
 }
-
 export default PostsList
+
+export const SinglePost = ({ post }) => {
+  return (
+    <article className="post-excerpt" key={post.id}>
+      <h3>{post.title}</h3>
+      <PostUser userId={post.user} />
+      <p className="posts-content">{post.content}</p>
+      <TimeAgo timestamp={post.date} />
+      <br></br>
+      <Link to={`posts/${post.id}`} className="button muted-button">
+        View Post
+      </Link>
+      <Link to={`editPost/${post.id}`} className="button muted-button">
+        EditPost
+      </Link>
+      <ReactionButtons post={post} />
+    </article>
+  )
+}
